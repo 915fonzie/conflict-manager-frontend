@@ -25,22 +25,32 @@ body
     border: #fff 1px solid;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    align-self: center;
 }
 
 .root-bot
 {
     border: #fff 1px solid;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-content: center;
+    align-self: center;
 }
 
 #sign-up
 {
-    display:grid;
-    justify-content: center;
-    border: #fff 1px solid;
-    grid-template-rows: 1fr 1fr;
+    justify-self: center;
+    align-self: center;
+    text-align: center;
+}
+#or{
+    justify-self: center;
+    align-self: center;
+
+}
+#login{
+    justify-self: center;
+    align-self: center;
+
+    text-align: center;
 }
