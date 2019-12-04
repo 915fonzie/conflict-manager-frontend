@@ -1,10 +1,14 @@
+
+/* --------This function is used to clear the DOM in order to render different pages ----*/
 function clearElements(domElement)
 {
     while (domElement.firstChild) {
     domElement.removeChild(domElement.firstChild);
     }
 }
+/* ---------------------------------------------------------------------------------------*/
 
+/*---------- Renders the Home page------------------------------------------------------- */
 class HomePage{
     static renderPage(bodyElement){
         clearElements(bodyElement);
@@ -113,7 +117,9 @@ class HomePage{
         rootBottom.appendChild(howPlayButton)
     }
 }
+/*-----------------------------------------------------------------------------*/
 
+/*---------------------- Renders the Character selection page ---------------- */
 class CharacterSelection{
     static renderPage(bodyElement){
         clearElements(bodyElement)
@@ -177,9 +183,10 @@ class CharacterSelection{
         })
     }
 }
+/*----------------------------------------------------------------------------------------*/
 
+/*--------------------- Renders the Background page ------------------------------------- */
 class ChooseBackground{
-
     static renderPage(bodyElement){
         clearElements(bodyElement)
         let backgroundTop = document.createElement('div');
@@ -232,8 +239,6 @@ class ChooseBackground{
             plusDivs(1)
         });
     }
-
-
     static renderBottom(backgroundBottom){
         let continueButton = document.createElement('button')
         continueButton.textContent = "Continue";
@@ -244,7 +249,9 @@ class ChooseBackground{
         })
     }
 }
+/*---------------------------------------------------------------------------*/
 
+/*-------------------------- Renders the Fight page -------------------------*/
 class FightPage{
     static renderPage(bodyElement){
         clearElements(bodyElement)
@@ -324,13 +331,13 @@ class FightPage{
         return middleRegionContainer;
     }
 }
+/*-------------------------------------------------------------------------*/
 
+/*-------------------- This section is for creating the slides for the background -----*/
 let slideIndex = 1;
-
 function plusDivs(n) {
     showDivs(slideIndex += n);
 }
-
 function showDivs(n) {
     let i;
     let x = document.getElementsByClassName("background");
@@ -342,6 +349,7 @@ function showDivs(n) {
     }
     x[slideIndex-1].style.display = "block";  
 }
+/*-------------------------------------------------------------------------------------*/
 
 document.addEventListener("DOMContentLoaded", function(e){
 
