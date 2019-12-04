@@ -11,7 +11,6 @@ body
 .root-top
 {
     display: grid;
-    border: #fff 1px solid;
     font-family: 'Anton', sans-serif;
     line-height: 1;
     font-size: 3em;
@@ -29,7 +28,6 @@ body
 
 .root-bot
 {
-    border: #fff 1px solid;
     display: flex;
     justify-content: space-around;
     align-content: center;
@@ -58,7 +56,6 @@ body
 
 .choose-top{
     display: grid;
-    border: #fff 1px solid;
     font-family: 'Anton', sans-serif;
     line-height: 1;
     font-size: 3em;
@@ -115,3 +112,90 @@ body
     justify-content: flex-end;
     margin: 60px;
 }
+
+.background-top
+{
+    display: grid;
+    font-family: 'Anton', sans-serif;
+    line-height: 1;
+    font-size: 3em;
+    color: #000;
+    justify-content: center;
+    align-content: center;
+}
+
+.background-mid
+{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    justify-self: center;
+}
+
+.background-bottom
+{
+    display: flex;
+    align-self: center;
+    justify-content: flex-end;
+    margin: 60px;
+}
+.background{
+    cursor: pointer;
+    height: 300px;
+    width: auto;
+}
+
+/* ---------------- THIS IS FOR THE FIGHT ---------------*/
+.fight-top
+{
+    display: grid;
+    font-family: 'Anton', sans-serif;
+    line-height: 1;
+    font-size: 3em;
+    color: #000;
+    justify-content: center;
+    align-content: center;
+}
+.fight-mid
+{
+    display:grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 4fr 1fr 4fr;
+}
+.fight-bottom
+{
+    justify-self: center;
+}
+.fighter-1
+{
+    display:grid;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+.fighter-1 > video
+{
+    width: 70%;
+    height: auto;
+    justify-self:center;
+}
+.middle-region
+{
+    text-align: center;
+    align-self:center;
+}
+.fighter-2
+{
+    display:grid;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+.fighter-2 > video
+{
+    transform: scaleX(-1);
+    justify-self: center;
+    width: 70%;
+    height: auto;
+}
+/* --------------------- END OF FIGHT ----------------------*/
