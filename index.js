@@ -259,14 +259,16 @@ class CharacterSelection{
         fetch(`http://localhost:3000/characters`)
             .then(resp => resp.json())
             .then(json => {
+                console.log(json)
                 for (let i = 0; i < json.length; i++)
                 {
                     let icon = document.createElement("img"); //input element, text
                     icon.setAttribute('class',`fighter-icon`);
                     icon.setAttribute('id',json[i].id);
-
-                    if(localStorage.getItem("userWins") >= json[i].wins_required)
+                    // console.log(json[i].wins_required, parseInt(localStorage.getItem("userWins")) )
+                    if(parseInt(localStorage.getItem("userWins")) >= json[i].wins_required)
                     {
+                        console.log("it hits", json[i].win_required)
                         icon.src = json[i].icon_img
                         icon.addEventListener('click', function(e){
                             localStorage.setItem("fighterId", e.target.id)
@@ -277,7 +279,6 @@ class CharacterSelection{
                     {
                         icon.src = 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500'
                     }
-
                     iconContainer.appendChild(icon);
                 }
         })
@@ -466,12 +467,12 @@ class FightPage{
                     if (json["defender_id"] == localStorage.getItem("fighterId"))
                     {
                         document.querySelector(".fighter-1-health").textContent = 0;
-                        console.log("player has died")
+                        FightPage.playerLosePage();
                     }
                     else
                     {
                         document.querySelector(".fighter-2-health").textContent = 0;
-                        console.log("enemy has died")
+                        FightPage.playerWinPage();
 
                     }
                 }  
@@ -480,13 +481,10 @@ class FightPage{
                     if (json["defender_id"] == localStorage.getItem("fighterId"))
                     {
                         document.querySelector(".fighter-1-health").textContent = json["defender_health"];
-                        console.log("player has taken damage")
-
                     }
                     else
                     {
                         document.querySelector(".fighter-2-health").textContent = json["defender_health"];
-                        console.log("enemy has taken damage")
                     }
 
                     // run animations stuff
@@ -513,6 +511,7 @@ class FightPage{
 
 
     }
+
     static createFighterDOM(fighterContainer, onRightSide, fighterJSON = null)
     {
         let fighterHealth = document.createElement('p');
@@ -529,6 +528,7 @@ class FightPage{
         fighterContainer.appendChild(fighterAnimation);
         fighterContainer.appendChild(fighterLabel);
     }
+
     static createMidSection(middleRegionContainer)
     {
         let middleRegionText = document.createElement('p');
@@ -536,6 +536,40 @@ class FightPage{
         middleRegionText.className = "middle-text";
         middleRegionText.textContent = "##HERE WE GO##";
         middleRegionContainer.appendChild(middleRegionText);
+    }
+
+    static playerWinPage()
+    {
+        // update mid section of web site
+        // update wins count of user
+        // update buttons
+    }
+
+    static playerLosePage()
+    {
+        // update mid section of web site
+        // update buttons
+
+        let middleText = document.querySelector('.middle-region');
+        middleText.textContent = "You Lose you loser";
+
+        let buttonContainer = document.querySelector('.fight-bottom');
+        clearElements(buttonContainer);
+        let playAgain = document.createElement('button');
+        playAgain.id = "play-again";
+        playAgain.textContent = 'Play Again?';
+        let exitGame = document.createElement('button');
+        exitGame.id = 'exit-game';
+        exitGame.textContent = 'Exit';
+        buttonContainer.appendChild(playAgain);
+        buttonContainer.appendChild(exitGame);
+        playAgain.addEventListener('click', function(e){
+            CharacterSelection.renderPage(bodyElement);
+        })
+        exitGame.addEventListener('click', function(e){
+            HomePage.renderPage(bodyElement);
+        })
+
     }
 }
 /*-------------------------------------------------------------------------*/
