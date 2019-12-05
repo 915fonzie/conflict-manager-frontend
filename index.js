@@ -1,4 +1,6 @@
 
+window.localStorage;
+
 /* --------This function is used to clear the DOM in order to render different pages ----*/
 function clearElements(domElement)
 {
@@ -79,16 +81,19 @@ class HomePage{
         // submitLogin.id = 'submit-button';
 
         let dropDown = document.createElement('select');
-        // ------------------------------------------- REPLACE THIS WITH A FETCH TO GET ALL USERS
-        for (let i = 1; i < 5; i++)
-        {
-            let option = document.createElement("option"); //input element, text
-            option.setAttribute('value',`User ${i}`);
-            option.setAttribute('name', "username");
-            option.textContent = `User ${i}`;
-            dropDown.appendChild(option);
-        }
-        // --------------------------------------------- REPLACE THIS WITH A FETCH TO GET ALL USERS
+        fetch('http://localhost:3000/users')
+        .then(resp => resp.json())
+        .then(json => {
+            for (let i = 0; i < json.length; i++)
+            {
+                let option = document.createElement("option"); //input element, text
+                option.setAttribute('value', json[i].id);
+                option.setAttribute('name', "username");
+                option.textContent = json[i].username;
+                dropDown.appendChild(option);
+            }
+        })
+
         loginForm.appendChild(dropDown);
         loginForm.appendChild(submitLogin);
         loginContainer.appendChild(loginForm);
@@ -96,13 +101,35 @@ class HomePage{
 
         signUpForm.addEventListener("submit", function(e){
             e.preventDefault();
-            console.log(e.target.username.value)
-            CharacterSelection.renderPage(bodyElement);
+            // console.log(e.target.username.value)
+            fetch("http://localhost:3000/users", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: e.target.username.value
+                })
+            })
+            .then(resp => resp.json())
+            .then(json => {
+                localStorage.setItem("userId", json["id"]);
+                localStorage.setItem("userWins", json["wins"])
+                CharacterSelection.renderPage(bodyElement);
+            })
+            .catch()
+
         })
         loginForm.addEventListener("submit", function(e){
             e.preventDefault();
-            console.log(e.target[0].value)
-            CharacterSelection.renderPage(bodyElement);
+            fetch(`http://localhost:3000/users/${e.target[0].value}`)
+            .then(resp => resp.json())
+            .then(json => {
+                localStorage.setItem("userId", json["id"]);
+                localStorage.setItem("userWins", json["wins"])
+                CharacterSelection.renderPage(bodyElement);
+            })
         })
     }
 
@@ -115,6 +142,81 @@ class HomePage{
         howPlayButton.id = 'how-to-play';
         rootBottom.appendChild(aboutButton)
         rootBottom.appendChild(howPlayButton)
+
+        aboutButton.addEventListener('click', function(){
+            About.renderPage(bodyElement);
+        })
+        howPlayButton.addEventListener('click', function(){
+            HowToPlay.renderPage(bodyElement);
+        })
+    }
+}
+/*-----------------------------------------------------------------------------*/
+
+/*------------------- Renders the About page-----------------------------------*/
+class About{
+    static renderPage(bodyElement){
+        clearElements(bodyElement);
+        let aboutTop = document.createElement('div');
+        aboutTop.className = "about-top";
+        let aboutMid = document.createElement('div');
+        aboutMid.className = "about-mid";
+        this.renderTop(aboutTop);
+        bodyElement.appendChild(aboutTop);
+        this.renderMid(aboutMid);
+        bodyElement.appendChild(aboutMid);
+    }
+
+    static renderTop(aboutTop){
+        let titleText = document.createElement('p');
+        titleText.textContent = "About"
+        aboutTop.appendChild(titleText);
+        let backButton = document.createElement('button');
+        backButton.textContent = 'Back';
+        aboutTop.appendChild(backButton);
+        backButton.addEventListener('click', function(){
+            HomePage.renderPage(bodyElement);
+        })
+    }
+
+    static renderMid(aboutMid){
+        let bodyText = document.createElement('p')
+        bodyText.textContent ="This is only temporary";
+        aboutMid.appendChild(bodyText);
+    }
+}
+/*-----------------------------------------------------------------------------*/
+
+/*------------------- Renders the About page-----------------------------------*/
+class HowToPlay{
+    static renderPage(bodyElement){
+        clearElements(bodyElement);
+        let howTop = document.createElement('div');
+        howTop.className = "about-top";
+        let howMid = document.createElement('div');
+        howMid.className = "about-mid";
+        this.renderTop(howTop);
+        bodyElement.appendChild(howTop);
+        this.renderMid(howMid);
+        bodyElement.appendChild(howMid);
+    }
+
+    static renderTop(howTop){
+        let titleText = document.createElement('p');
+        titleText.textContent = "How to Play"
+        howTop.appendChild(titleText);
+        let backButton = document.createElement('button');
+        backButton.textContent = 'Back';
+        howTop.appendChild(backButton);
+        backButton.addEventListener('click', function(){
+            HomePage.renderPage(bodyElement);
+        })
+    }
+
+    static renderMid(howMid){
+        let bodyText = document.createElement('p')
+        bodyText.textContent ="This is only temporary for the how page";
+        howMid.appendChild(bodyText);
     }
 }
 /*-----------------------------------------------------------------------------*/
@@ -151,23 +253,35 @@ class CharacterSelection{
         iconContainer.id = "images";
         dynamicDescription.id = "description";
 
-        // ------------------------------- REPLACE THIS WITH A FETCH TO GET ALL CHARACTER ICONS
-
-        for (let i = 1; i <= 8; i++)
-        {
-            let icon = document.createElement("img"); //input element, text
-            icon.setAttribute('class',`fighter-icon`);
-            icon.setAttribute('id',`fighter${i}`);
-            icon.src = 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500';
-            iconContainer.appendChild(icon);
-        }
-
-        // -------------------------------- REPLACE THIS WITH A FETCH TO GET ALL CHARACTER ICONS
-
-        dynamicDescription.textContent = "If they ain't civil, then they ain't here!";
-
         chooseMid.appendChild(iconContainer);
         chooseMid.appendChild(dynamicDescription);
+
+        fetch(`http://localhost:3000/characters`)
+            .then(resp => resp.json())
+            .then(json => {
+                for (let i = 0; i < json.length; i++)
+                {
+                    let icon = document.createElement("img"); //input element, text
+                    icon.setAttribute('class',`fighter-icon`);
+                    icon.setAttribute('id',json[i].id);
+
+                    if(localStorage.getItem("userWins") >= json[i].wins_required)
+                    {
+                        icon.src = json[i].icon_img
+                        icon.addEventListener('click', function(e){
+                            localStorage.setItem("fighterId", e.target.id)
+                            dynamicDescription.textContent = json[e.target.id].description;
+                        });
+                    }
+                    else
+                    {
+                        icon.src = 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500'
+                    }
+
+                    iconContainer.appendChild(icon);
+                }
+        })
+     
     }
 
     static renderBottom(chooseBottom)
@@ -276,59 +390,152 @@ class FightPage{
     }
     static renderMid(chooseMid)
     {
-        let fighterContainerLeft = this.createFighterDOM(false); // ---------- WILL USE A JSON OBJECT FOR FUTURE - REPLACE NIL
-        let midSectionContainer = this.createMidSection();
-        let fighterContainerRight = this.createFighterDOM(true); // ---------------- WILL USE A JSON OBJECT FOR FUTURE - REPLACE NIL
+        let fighterContainerLeft = document.createElement('div');
+        let midSectionContainer = document.createElement('div');
+        let fighterContainerRight = document.createElement('div');
+
         chooseMid.appendChild(fighterContainerLeft);
         chooseMid.appendChild(midSectionContainer);
         chooseMid.appendChild(fighterContainerRight);
+
+        fetch(`http://localhost:3000/characters/${localStorage.getItem("fighterId")}`)
+        .then(resp => resp.json())
+        .then(json => {
+            this.createFighterDOM(fighterContainerLeft, false, json);
+            this.createMidSection(midSectionContainer); 
+        })
+
+        let randomEnemyId = parseInt(Math.random()*Math.floor(7) + 1);
+
+        while (randomEnemyId == localStorage.getItem("fighterId"))
+        {
+            randomEnemyId = parseInt(Math.random()*Math.floor(7) + 1);
+        }
+
+        localStorage.setItem("enemyId", randomEnemyId)
+
+        fetch(`http://localhost:3000/characters/${randomEnemyId}`) /* MAGIC NUMBER GROSSSSSSSSS */
+        .then(resp => resp.json())
+        .then(json => {
+            fighterContainerRight = this.createFighterDOM(fighterContainerRight, true, json);
+        });
+
     }
     static renderBottom(fightBottom)
     {
-        let quickAttackButton = document.createElement('button');
-        let strongAttackButton = document.createElement('button');
+        let attackButton = document.createElement('button');
         let dodgeButton = document.createElement('button');
         let forfeitButton = document.createElement('button');
-        quickAttackButton.className = "quick-attack";
-        strongAttackButton.className = "strong-attack";
+        
+        attackButton.className = "attack";
         dodgeButton.className = "dodge-attack";
         forfeitButton.className = "forfeit";
-        quickAttackButton.textContent = "Quick Attack";
-        strongAttackButton.textContent = "Strong Attack";
+        attackButton.textContent = "Attack";
         dodgeButton.textContent = "Dodge";
         forfeitButton.textContent = "Forfeit";
-        fightBottom.appendChild(quickAttackButton);
-        fightBottom.appendChild(strongAttackButton);
+
+        fightBottom.appendChild(attackButton);
         fightBottom.appendChild(dodgeButton);
         fightBottom.appendChild(forfeitButton);
+
+        forfeitButton.addEventListener('click', function(){
+            clearElements(bodyElement);
+            HomePage.renderPage(bodyElement);
+        })
+
+        function combatRound(attackerId, defenderId, defenderDodge = false)
+        {
+            console.log(attackerId, defenderId);
+            fetch('http://localhost:3000/characters',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accepts': 'application/json'    
+                },
+                body: JSON.stringify({
+                    attacker_id: attackerId,
+                    defender_id: defenderId,
+                    defender_dodge: defenderDodge
+                })
+            })
+            .then(resp => resp.json())
+            .then(json =>{
+                console.log(json)
+                if (json["defender_health"] < 0)
+                {
+                    if (json["defender_id"] == localStorage.getItem("fighterId"))
+                    {
+                        document.querySelector(".fighter-1-health").textContent = 0;
+                        console.log("player has died")
+                    }
+                    else
+                    {
+                        document.querySelector(".fighter-2-health").textContent = 0;
+                        console.log("enemy has died")
+
+                    }
+                }  
+                else // if the fight is not over
+                {
+                    if (json["defender_id"] == localStorage.getItem("fighterId"))
+                    {
+                        document.querySelector(".fighter-1-health").textContent = json["defender_health"];
+                        console.log("player has taken damage")
+
+                    }
+                    else
+                    {
+                        document.querySelector(".fighter-2-health").textContent = json["defender_health"];
+                        console.log("enemy has taken damage")
+                    }
+
+                    // run animations stuff
+                    // wait a couple seconds
+                    // if this was the player's round
+                        // create and run combatRound for enemy
+                    // if this was the enemy's round
+                        // do nothing
+                }
+
+            })
+            .catch()
+        }
+        
+        attackButton.addEventListener('click', function(e){
+            combatRound(localStorage.getItem("fighterId"), localStorage.getItem("enemyId"));
+            setTimeout(combatRound(localStorage.getItem("enemyId"), localStorage.getItem("fighterId")), 10000);
+           
+        })
+
+        dodgeButton.addEventListener('click', function(e){
+            combatRound(localStorage.getItem("enemyId"), localStorage.getItem("fighterId"), true)
+        })
+
+
     }
-    static createFighterDOM(onRightSide, fighterJSON = null)
+    static createFighterDOM(fighterContainer, onRightSide, fighterJSON = null)
     {
-        let fighterContainer = document.createElement('div');
         let fighterHealth = document.createElement('p');
         let fighterAnimation = document.createElement('img');
         let fighterLabel = document.createElement('p');
         fighterContainer.className = `fighter-${onRightSide + 1}`;
         fighterHealth.className = `fighter-${onRightSide + 1}-health`;
-        fighterHealth.textContent = `##100##`;
+        fighterHealth.textContent = fighterJSON["health"];
         fighterAnimation.className = `fighter-${onRightSide + 1}-animation`;
-        fighterAnimation.src = "https://media.giphy.com/media/f4HpCDvF84oh2/giphy.gif";
+        fighterAnimation.src = fighterJSON["idle_gif"];
         fighterLabel.className = `fighter-${onRightSide + 1}-label`;
-        fighterLabel.textContent = `##FIGHTER NAME##`
+        fighterLabel.textContent = fighterJSON["name"]
         fighterContainer.appendChild(fighterHealth);
         fighterContainer.appendChild(fighterAnimation);
         fighterContainer.appendChild(fighterLabel);
-        return fighterContainer;
     }
-    static createMidSection()
+    static createMidSection(middleRegionContainer)
     {
-        let middleRegionContainer = document.createElement('div');
         let middleRegionText = document.createElement('p');
         middleRegionContainer.className = "middle-region";
         middleRegionText.className = "middle-text";
         middleRegionText.textContent = "##HERE WE GO##";
         middleRegionContainer.appendChild(middleRegionText);
-        return middleRegionContainer;
     }
 }
 /*-------------------------------------------------------------------------*/

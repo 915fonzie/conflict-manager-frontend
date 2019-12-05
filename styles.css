@@ -52,6 +52,28 @@ body
     text-align: center;
 }
 
+.about-top{
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+.about-top > p{
+    font-family: 'Anton', sans-serif;
+    line-height: 1;
+    font-size: 3em;
+    color: #000;
+}
+
+.about-top > button{
+    justify-self: flex-end;
+    align-self: center;
+}
+.about-mid{
+    font-size: 1.5em;
+    justify-self: center;
+    align-self: center;
+}
+
 /* This is for the character selection*/
 
 .choose-top{
@@ -173,7 +195,7 @@ body
     justify-content: center;
     text-align: center;
 }
-.fighter-1 > video
+.fighter-1 > img
 {
     width: 70%;
     height: auto;
@@ -191,7 +213,7 @@ body
     justify-content: center;
     text-align: center;
 }
-.fighter-2 > video
+.fighter-2 > img
 {
     transform: scaleX(-1);
     justify-self: center;
