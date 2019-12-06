@@ -1,4 +1,4 @@
-
+/*allows us to use localStorage */
 window.localStorage;
 
 /* --------This function is used to clear the DOM in order to render different pages ----*/
@@ -9,7 +9,6 @@ function clearElements(domElement)
     }
 }
 /* ---------------------------------------------------------------------------------------*/
-
 /*---------- Renders the Home page------------------------------------------------------- */
 class HomePage{
     static renderPage(bodyElement){
@@ -24,10 +23,6 @@ class HomePage{
         bodyElement.appendChild(rootTop);
         this.renderMid(rootMid);
         bodyElement.appendChild(rootMid);
-        this.renderBottom(rootBottom);
-        bodyElement.appendChild(rootBottom);
-
-
     }
 
     static renderTop(rootTop){
@@ -138,99 +133,8 @@ class HomePage{
             })
         })
     }
-
-    static renderBottom(rootBottom){
-        let aboutButton = document.createElement('button');
-        aboutButton.textContent = 'About';
-        aboutButton.id = 'about';
-        let howPlayButton = document.createElement('button');
-        howPlayButton.textContent = 'How to Play';
-        howPlayButton.id = 'how-to-play';
-        rootBottom.appendChild(aboutButton)
-        rootBottom.appendChild(howPlayButton)
-
-        aboutButton.addEventListener('click', function(){
-            buttonClickAudio.play()
-            About.renderPage(bodyElement);
-        })
-        howPlayButton.addEventListener('click', function(){
-            buttonClickAudio.play()
-            HowToPlay.renderPage(bodyElement);
-        })
-    }
 }
 /*-----------------------------------------------------------------------------*/
-
-/*------------------- Renders the About page-----------------------------------*/
-class About{
-    static renderPage(bodyElement){
-        clearElements(bodyElement);
-        let aboutTop = document.createElement('div');
-        aboutTop.className = "about-top";
-        let aboutMid = document.createElement('div');
-        aboutMid.className = "about-mid";
-        this.renderTop(aboutTop);
-        bodyElement.appendChild(aboutTop);
-        this.renderMid(aboutMid);
-        bodyElement.appendChild(aboutMid);
-    }
-
-    static renderTop(aboutTop){
-        let titleText = document.createElement('p');
-        titleText.textContent = "About"
-        aboutTop.appendChild(titleText);
-        let backButton = document.createElement('button');
-        backButton.textContent = 'Back';
-        aboutTop.appendChild(backButton);
-        backButton.addEventListener('click', function(){
-            buttonClickAudio.play()
-            HomePage.renderPage(bodyElement);
-        })
-    }
-
-    static renderMid(aboutMid){
-        let bodyText = document.createElement('p')
-        bodyText.textContent ="This is only temporary";
-        aboutMid.appendChild(bodyText);
-    }
-}
-/*-----------------------------------------------------------------------------*/
-
-/*------------------- Renders the About page-----------------------------------*/
-class HowToPlay{
-    static renderPage(bodyElement){
-        clearElements(bodyElement);
-        let howTop = document.createElement('div');
-        howTop.className = "about-top";
-        let howMid = document.createElement('div');
-        howMid.className = "about-mid";
-        this.renderTop(howTop);
-        bodyElement.appendChild(howTop);
-        this.renderMid(howMid);
-        bodyElement.appendChild(howMid);
-    }
-
-    static renderTop(howTop){
-        let titleText = document.createElement('p');
-        titleText.textContent = "How to Play"
-        howTop.appendChild(titleText);
-        let backButton = document.createElement('button');
-        backButton.textContent = 'Back';
-        howTop.appendChild(backButton);
-        backButton.addEventListener('click', function(){
-            buttonClickAudio.play();
-            HomePage.renderPage(bodyElement);
-        })
-    }
-
-    static renderMid(howMid){
-        let bodyText = document.createElement('p')
-        bodyText.textContent ="This is only temporary for the how page";
-        howMid.appendChild(bodyText);
-    }
-}
-/*-----------------------------------------------------------------------------*/
-
 /*---------------------- Renders the Character selection page ---------------- */
 class CharacterSelection{
     static renderPage(bodyElement){
@@ -259,12 +163,16 @@ class CharacterSelection{
     static renderMid(chooseMid)
     {
         let iconContainer = document.createElement('div');
-        let dynamicDescription = document.createElement('p')
+        let dynamicDescription = document.createElement('p');
+        let iconName = document.createElement('p');
         iconContainer.id = "images";
         dynamicDescription.id = "description";
+        iconName.id = "icon-name";
 
         chooseMid.appendChild(iconContainer);
+        chooseMid.appendChild(iconName);
         chooseMid.appendChild(dynamicDescription);
+        
 
         fetch(`http://localhost:3000/characters`)
             .then(resp => resp.json())
@@ -274,13 +182,18 @@ class CharacterSelection{
                     let icon = document.createElement("img"); //input element, text
                     icon.setAttribute('class',`fighter-icon`);
                     icon.setAttribute('id',json[i].id);
+                    let iconAudio = document.createElement('audio');
+                    iconAudio.volume = .5;
                     if(parseInt(localStorage.getItem("userWins")) >= json[i].wins_required)
                     {
                         console.log("it hits", json[i].win_required)
                         icon.src = json[i].icon_img
+                        iconAudio.src = json[i].icon_audio_url
                         icon.addEventListener('click', function(e){
                             localStorage.setItem("fighterId", json[i].id)
                             dynamicDescription.textContent = json[i].description;
+                            iconName.textContent = json[i].name;
+                            iconAudio.play();
                         });
                     }
                     else
@@ -471,17 +384,18 @@ class FightPage{
             })
             let defender = await response.json();
             localStorage.setItem('defenderHealth', defender["defender_health"])
+            console.log(defender)
             if (defender["defender_health"] <= 0)
             {
                 if (defender["defender_id"] == localStorage.getItem("fighterId"))
                 {
                     document.querySelector(".fighter-1-health").textContent = 0;
-                    FightPage.playerLosePage();
+                    FightPage.playerLosePage(defender['defender_defeated_gif']);
                 }
                 else
                 {
                     document.querySelector(".fighter-2-health").textContent = 0;
-                    FightPage.playerWinPage();
+                    FightPage.playerWinPage(defender['defender_defeated_gif']);
                     // update wins
                 }
             }  
@@ -529,15 +443,22 @@ class FightPage{
 
     static createMidSection(middleRegionContainer)
     {
-        let middleRegionText = document.createElement('p');
+        let middleRegionText = document.createElement('img');
         middleRegionContainer.className = "middle-region";
         middleRegionText.className = "middle-text";
         middleRegionContainer.appendChild(middleRegionText);
     }
 
-    static playerWinPage()
+    static playerWinPage(fighterGif)
     {
-        this.resultUpdate("You win you Winner");
+        this.resultUpdate("https://mod3-project.s3-us-west-2.amazonaws.com/you-win.png");
+        let fighter = document.querySelector('.fighter-2-animation');
+        fighter.src = fighterGif
+        let winAudio = document.createElement('audio');
+        winAudio.src = winAudioArray[parseInt(Math.random()*Math.floor(4))];
+        document.body.appendChild(winAudio);
+        winAudio.volume = 1.0;
+        winAudio.play();
         localStorage.setItem('userWins', parseInt(localStorage.getItem('userWins')) + 1)
         fetch(`http://localhost:3000/users/${localStorage.getItem('userId')}`, {
             method: 'PATCH',
@@ -557,14 +478,20 @@ class FightPage{
         .catch()
     }
 
-    static playerLosePage()
+    static playerLosePage(fighterGif)
     {
-        this.resultUpdate("You lose you Loser");
+        this.resultUpdate("https://mod3-project.s3-us-west-2.amazonaws.com/you-lose.png");
+        let fighter = document.querySelector('.fighter-1-animation');
+        fighter.src = fighterGif
+        let loseAudio = document.createElement('audio');
+        loseAudio.src = loseAudioArray[parseInt(Math.random()*Math.floor(4))];
+        document.body.appendChild(loseAudio);
+        loseAudio.play();
     }
 
-    static resultUpdate(message){
+    static resultUpdate(url){
         let middleText = document.querySelector('.middle-text');
-        middleText.textContent = message;
+        middleText.src = url;
         console.log(middleText.textContent)
         let buttonContainer = document.querySelector('.fight-bottom');
         clearElements(buttonContainer);
@@ -591,8 +518,11 @@ class FightPage{
 /*-------------------- This section is for creating the slides for the background -----*/
 let slideIndex = 0;
 let backgroundArray = ["https://i.imgur.com/Lg2omfl.gif","https://i.imgur.com/8FoYKgc.gif", "https://i.imgur.com/avuyoaD.gif", "https://i.imgur.com/wp3leDc.gif", "https://i.imgur.com/K7fu07T.gif", "https://i.imgur.com/YWCqjwV.gif", "https://i.imgur.com/Sx7PROj.gif"]
+let winAudioArray = ['https://mod3-project.s3-us-west-2.amazonaws.com/win5.mp3','https://mod3-project.s3-us-west-2.amazonaws.com/win6.mp3','https://mod3-project.s3-us-west-2.amazonaws.com/win7.mp3', 'https://mod3-project.s3-us-west-2.amazonaws.com/win8.mp3','https://mod3-project.s3-us-west-2.amazonaws.com/win9.mp3']
+let loseAudioArray = ['https://mod3-project.s3-us-west-2.amazonaws.com/lose1.mp3', 'https://mod3-project.s3-us-west-2.amazonaws.com/lose2.mp3','https://mod3-project.s3-us-west-2.amazonaws.com/lose3.mp3','https://mod3-project.s3-us-west-2.amazonaws.com/lose5.mp3']
 let buttonClickAudio = new Audio('https://freesound.org/data/previews/322/322228_5048136-lq.mp3');
 buttonClickAudio.type = 'audio/mp3'
+buttonClickAudio.volume = .1;
 function incrementBackgroundIndex(increment, currentIndex, sourceArray)
 {
     if (increment === true)
@@ -627,6 +557,7 @@ function playBackground(){
         audioTest.src = 'https://mod3-project.s3-us-west-2.amazonaws.com/Premium+retro+swing+music+for+Cooking+Shows+and+Videos+-+Food+Show+Kochshow+Music.mp3'
         document.head.appendChild(audioTest)
         audioTest.loop = true;
+        audioTest.volume = 0.05;
         audioTest.play()
     }
 }
