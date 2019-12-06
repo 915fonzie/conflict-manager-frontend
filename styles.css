@@ -153,6 +153,15 @@ body
     align-self: center;
     justify-self: center;
 }
+#backgrounds{
+    align-self: center;
+}
+/* #left-click{
+    align-content: center;
+}
+#right-click{
+    align-content: center;
+} */
 
 .background-bottom
 {
@@ -162,9 +171,8 @@ body
     margin: 60px;
 }
 .background{
-    cursor: pointer;
-    height: 300px;
-    width: auto;
+    height: auto;
+    width: 700px;
 }
 
 /* ---------------- THIS IS FOR THE FIGHT ---------------*/
@@ -180,6 +188,8 @@ body
 }
 .fight-mid
 {
+    background-size: contain;
+    background: no-repeat center;
     display:grid;
     grid-template-rows: 1fr;
     grid-template-columns: 4fr 1fr 4fr;
@@ -191,9 +201,18 @@ body
 .fighter-1
 {
     display:grid;
-    align-content: center;
+    align-content: flex-end;
     justify-content: center;
     text-align: center;
+}
+
+.fighter-1-label{
+    display: flex;
+    justify-content: space-evenly;
+    font-family: 'JMH Cthulhumbus Arcade';
+    font-size: 2em;
+    text-shadow: 2px 3px darkred;
+    color: rgb(136, 255, 0);
 }
 .fighter-1 > img
 {
@@ -206,12 +225,28 @@ body
     text-align: center;
     align-self:center;
 }
+
+.middle-text{
+        font-family: 'JMH Cthulhumbus Arcade';
+    font-size: 2em;
+    text-shadow: 2px 3px darkred;
+    color: rgb(136, 255, 0);;
+}
 .fighter-2
 {
     display:grid;
-    align-content: center;
+    align-content: flex-end;
     justify-content: center;
     text-align: center;
+}
+
+.fighter-2-label{
+    display: flex;
+    justify-content: space-evenly;
+    font-family: 'JMH Cthulhumbus Arcade';
+    font-size: 2em;
+    text-shadow: 3px 2px darkred;
+    color: rgb(136, 255, 0);;
 }
 .fighter-2 > img
 {
