@@ -38,20 +38,23 @@ class HomePage{
         let signUpForm = document.createElement("form");
         signUpForm.setAttribute('method',"post");
         signUpForm.className = "submit-form"
-
+        let inputDiv = document.createElement('div');
+        inputDiv.className = 'ui input'
         let input = document.createElement("input"); //input element, text
         input.setAttribute('type',"text");
         input.setAttribute('name',"username");
-        input.placeholder = "Create Username"
+        input.placeholder = "Create Username";
 
         let submitSignUp = document.createElement("input"); //input element, Submit button
         submitSignUp.setAttribute('type',"submit");
         submitSignUp.setAttribute('value',"Submit");
+        submitSignUp.className = 'ui button'
         signUpForm.textContent = "SIGN UP:";
 
         let breakSpace = document.createElement('br');
         signUpForm.appendChild(breakSpace);
-        signUpForm.appendChild(input);
+        signUpForm.appendChild(inputDiv);
+        inputDiv.appendChild(input);
         signUpForm.appendChild(submitSignUp);
         signUpContainer.appendChild(signUpForm)
         rootMid.appendChild(signUpContainer);
@@ -75,9 +78,10 @@ class HomePage{
         let submitLogin = document.createElement("input"); //input element, Submit button
         submitLogin.setAttribute('type',"submit");
         submitLogin.setAttribute('value',"Submit");
-        // submitLogin.id = 'submit-button';
+        submitLogin.className = 'ui button';
 
         let dropDown = document.createElement('select');
+        dropDown.className = "ui dropdown";
         fetch('http://localhost:3000/users')
         .then(resp => resp.json())
         .then(json => {
