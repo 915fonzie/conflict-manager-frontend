@@ -82,18 +82,17 @@ class HomePage{
 
         let dropDown = document.createElement('select');
         dropDown.className = "ui dropdown";
-        fetch('http://localhost:3000/users')
-        .then(resp => resp.json())
-        .then(json => {
-            for (let i = 0; i < json.length; i++)
-            {
-                let option = document.createElement("option"); //input element, text
-                option.setAttribute('value', json[i].id);
-                option.setAttribute('name', "username");
-                option.textContent = json[i].username;
-                dropDown.appendChild(option);
+        fetch("https://conflict-manager.herokuapp.com/users")
+          .then(resp => resp.json())
+          .then(json => {
+            for (let i = 0; i < json.length; i++) {
+              let option = document.createElement("option"); //input element, text
+              option.setAttribute("value", json[i].id);
+              option.setAttribute("name", "username");
+              option.textContent = json[i].username;
+              dropDown.appendChild(option);
             }
-        })
+          });
 
         loginForm.appendChild(dropDown);
         loginForm.appendChild(submitLogin);
@@ -103,38 +102,40 @@ class HomePage{
         signUpForm.addEventListener("submit", function(e){
             e.preventDefault();
             // console.log(e.target.username.value)
-            fetch("http://localhost:3000/users", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: e.target.username.value
-                })
+            fetch("https://conflict-manager.herokuapp.com/users", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+              },
+              body: JSON.stringify({
+                username: e.target.username.value
+              })
             })
-            .then(resp => resp.json())
-            .then(json => {
+              .then(resp => resp.json())
+              .then(json => {
                 localStorage.setItem("userId", json["id"]);
                 localStorage.setItem("userWins", json["wins"]);
                 playBackground();
                 buttonClickAudio.play();
                 CharacterSelection.renderPage(bodyElement);
-            })
-            .catch()
+              })
+              .catch();
 
         })
         loginForm.addEventListener("submit", function(e){
             e.preventDefault();
-            fetch(`http://localhost:3000/users/${e.target[0].value}`)
-            .then(resp => resp.json())
-            .then(json => {
+            fetch(
+              `https://conflict-manager.herokuapp.com/users/${e.target[0].value}`
+            )
+              .then(resp => resp.json())
+              .then(json => {
                 localStorage.setItem("userId", json["id"]);
                 localStorage.setItem("userWins", json["wins"]);
                 playBackground();
                 buttonClickAudio.play();
                 CharacterSelection.renderPage(bodyElement);
-            })
+              });
         })
     }
 }
@@ -178,35 +179,34 @@ class CharacterSelection{
         chooseMid.appendChild(dynamicDescription);
         
 
-        fetch(`http://localhost:3000/characters`)
-            .then(resp => resp.json())
-            .then(json => {
-                for (let i = 0; i < json.length; i++)
-                {
-                    let icon = document.createElement("img"); //input element, text
-                    icon.setAttribute('class',`fighter-icon`);
-                    icon.setAttribute('id',json[i].id);
-                    let iconAudio = document.createElement('audio');
-                    iconAudio.volume = .5;
-                    if(parseInt(localStorage.getItem("userWins")) >= json[i].wins_required)
-                    {
-                        console.log("it hits", json[i].win_required)
-                        icon.src = json[i].icon_img
-                        iconAudio.src = json[i].icon_audio_url
-                        icon.addEventListener('click', function(e){
-                            localStorage.setItem("fighterId", json[i].id)
-                            dynamicDescription.textContent = json[i].description;
-                            iconName.textContent = json[i].name;
-                            iconAudio.play();
-                        });
-                    }
-                    else
-                    {
-                        icon.src = 'https://i.imgur.com/VNYNDVn.png'
-                    }
-                    iconContainer.appendChild(icon);
-                }
-        })
+        fetch(`https://conflict-manager.herokuapp.com/characters`)
+          .then(resp => resp.json())
+          .then(json => {
+            for (let i = 0; i < json.length; i++) {
+              let icon = document.createElement("img"); //input element, text
+              icon.setAttribute("class", `fighter-icon`);
+              icon.setAttribute("id", json[i].id);
+              let iconAudio = document.createElement("audio");
+              iconAudio.volume = 0.5;
+              if (
+                parseInt(localStorage.getItem("userWins")) >=
+                json[i].wins_required
+              ) {
+                console.log("it hits", json[i].win_required);
+                icon.src = json[i].icon_img;
+                iconAudio.src = json[i].icon_audio_url;
+                icon.addEventListener("click", function(e) {
+                  localStorage.setItem("fighterId", json[i].id);
+                  dynamicDescription.textContent = json[i].description;
+                  iconName.textContent = json[i].name;
+                  iconAudio.play();
+                });
+              } else {
+                icon.src = "https://i.imgur.com/VNYNDVn.png";
+              }
+              iconContainer.appendChild(icon);
+            }
+          });
      
     }
 
@@ -325,12 +325,16 @@ class FightPage{
         chooseMid.appendChild(fighterContainerRight);
 
 
-        fetch(`http://localhost:3000/characters/${localStorage.getItem("fighterId")}`)
-        .then(resp => resp.json())
-        .then(json => {
+        fetch(
+          `https://conflict-manager.herokuapp.com/characters/${localStorage.getItem(
+            "fighterId"
+          )}`
+        )
+          .then(resp => resp.json())
+          .then(json => {
             this.createFighterDOM(fighterContainerLeft, false, json);
-            this.createMidSection(midSectionContainer); 
-        })
+            this.createMidSection(midSectionContainer);
+          });
 
         let randomEnemyId = parseInt(Math.random()*Math.floor(7) + 1);
 
@@ -341,11 +345,17 @@ class FightPage{
 
         localStorage.setItem("enemyId", randomEnemyId)
 
-        fetch(`http://localhost:3000/characters/${randomEnemyId}`) 
-        .then(resp => resp.json())
-        .then(json => {
-            fighterContainerRight = this.createFighterDOM(fighterContainerRight, true, json);
-        });
+        fetch(
+          `https://conflict-manager.herokuapp.com/characters/${randomEnemyId}`
+        )
+          .then(resp => resp.json())
+          .then(json => {
+            fighterContainerRight = this.createFighterDOM(
+              fighterContainerRight,
+              true,
+              json
+            );
+          });
 
     }
     static renderBottom(fightBottom)
@@ -374,18 +384,21 @@ class FightPage{
         async function combatRound(attackerId, defenderId, defenderDodge = false)
         {
             console.log(attackerId, defenderId);
-            let response = await fetch('http://localhost:3000/characters',{
-                method: 'POST',
+            let response = await fetch(
+              "https://conflict-manager.herokuapp.com/characters",
+              {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accepts': 'application/json'    
+                  "Content-Type": "application/json",
+                  Accepts: "application/json"
                 },
                 body: JSON.stringify({
-                    attacker_id: attackerId,
-                    defender_id: defenderId,
-                    defender_dodge: defenderDodge
+                  attacker_id: attackerId,
+                  defender_id: defenderId,
+                  defender_dodge: defenderDodge
                 })
-            })
+              }
+            );
             let defender = await response.json();
             localStorage.setItem('defenderHealth', defender["defender_health"])
             console.log(defender)
@@ -464,22 +477,27 @@ class FightPage{
         winAudio.volume = 1.0;
         winAudio.play();
         localStorage.setItem('userWins', parseInt(localStorage.getItem('userWins')) + 1)
-        fetch(`http://localhost:3000/users/${localStorage.getItem('userId')}`, {
-            method: 'PATCH',
+        fetch(
+          `https://conflict-manager.herokuapp.com/users/${localStorage.getItem(
+            "userId"
+          )}`,
+          {
+            method: "PATCH",
             headers: {
-                'Content-Type': 'application/json',
-                'Accepts': 'application/json'
+              "Content-Type": "application/json",
+              Accepts: "application/json"
             },
             body: JSON.stringify({
-                wins: localStorage.getItem('userWins')
+              wins: localStorage.getItem("userWins")
             })
-        })
-        .then(resp => resp.json())
-        .then(json => {
-            console.log(json)
-            console.log(localStorage.getItem('userWins'))
-        })
-        .catch()
+          }
+        )
+          .then(resp => resp.json())
+          .then(json => {
+            console.log(json);
+            console.log(localStorage.getItem("userWins"));
+          })
+          .catch();
     }
 
     static playerLosePage(fighterGif)
